@@ -6,5 +6,8 @@ export const openModal = () => ({
 
 export const closeModal = () => ({
   type: types.CLOSE_MODAL
-  
+});
+export const setContact = (contact) => ({
+  type: types.GET_CONTACT,
+  payload : contact
 });

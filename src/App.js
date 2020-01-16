@@ -1,5 +1,5 @@
 import React ,  { Fragment } from 'react';
-import { Router, Route, Redirect, Switch } from 'react-router-dom';
+import { Router, Route,  Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import history from './services/BrowserHistory';
 import { store } from './services/Redux';
@@ -13,7 +13,7 @@ class App extends React.Component {
           <Router history={history}>
             <Switch>
               <Route exact path="/" component={HomeContainer} />
-              <Route exact path="/modal/:id" component={Modal} />
+              <Route exact path="/modal/:country"  component={Modal} />
               {/* <Route render={() => <Redirect to="/" />} /> */}
 
             </Switch>

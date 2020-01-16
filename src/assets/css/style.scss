@@ -24,23 +24,31 @@ body{
         border: 1px solid;
         #btn-container{
             align-items: center;
-            
-            button{
-                margin-left: 20px;
-                margin-right: 20px;
-            }
         }
     }
 }
-
+button{
+    margin-left: 20px;
+    margin-right: 20px;
+}
 .button-modal-a{
     color: #46139f ;
     border: 1px solid;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.button-modal-close{
+    color: #46139f ;
+    border: 1px solid #46139f;
+
 }
 
 .button-modal-b{
     color: #ff7f50 ;
     border: 1px solid;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .main-div{

@@ -1,32 +1,85 @@
 import React from 'react';
 import "../assets/css/style.scss"
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-
+import {  Link } from 'react-router-dom';
+import {APP_CONFIG} from '../constants/config'
+import {getContacts} from "../api/index"
+import { Scrollbars } from 'react-custom-scrollbars';
 class ModalPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          
+          total : this.props.total,
+          contactIds : this.props.contactIds,
+          contacts : this.props.contacts,
         }
     }
     
+    componentDidMount(){
+       
+        let paramsForApi = {}
+        paramsForApi.companyId = APP_CONFIG.COMPANY_ID
+        
+        if(this.props.match.params.country === "all"){
+
+        }else{
+            paramsForApi.country = APP_CONFIG.US_COUNTRY_ID;
+        }
+        getContacts(paramsForApi).then((result) =>{
+            if (result) {
+                this.props.setContacts(result);
+            }
+        })
+    
+        
+    }
+
+    componentDidUpdate(nextProps){
+        if(nextProps.match.params.country !== this.props.match.params.country){
+            let paramsForApi = {}
+            paramsForApi.companyId = APP_CONFIG.COMPANY_ID
+            
+            if(this.props.match.params.country === "all"){
+
+            }else{
+                paramsForApi.country = APP_CONFIG.US_COUNTRY_ID;
+            }
+            getContacts(paramsForApi).then((result) =>{
+                if (result) {
+                    this.props.setContacts(result);
+                }
+            })
+        }
+        
+    }
+
     handleClose = (e) => {
         this.props.closeModal();
         e.stopPropagation();
         this.props.history.push('/')
         
     }
+    handleCloseModal = (e) => {
+        this.props.closeModal();
+    }
     
     render() {
+        
+        
         return (
-            <Modal isOpen={this.props.modal} toggle={this.handleClose}>
-                <ModalHeader toggle={this.handleClose}>Modal title</ModalHeader>
+            <Modal isOpen={true} toggle={this.handleClose}>
+                <ModalHeader >
+                    <Link to={{pathname: "/modal/all",    state: { modal: true },  }} className="btn btn-md button-modal-a" onClick={this.handleCloseModal} >All Contacts</Link>
+                    <Link to={{pathname: "/modal/us-country",    state: { modal: true },  }} color="normal" className="btn btn-md button-modal-b" onClick={this.handleCloseModal}>US Contacts</Link>
+                    <Button color="normal" className="btn btn-md button-modal-close" onClick={this.handleClose}>Close</Button>
+                </ModalHeader>
                 <ModalBody>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                <Scrollbars style={{ height: 300 }}>
+                    
+                </Scrollbars>
                 </ModalBody>
                 <ModalFooter>
-                <Button color="primary" onClick={this.handleClose}>Do Something</Button>{' '}
-                <Button color="secondary" onClick={this.handleClose}>Cancel</Button>
+                
                 </ModalFooter>
             </Modal>
             
