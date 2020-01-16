@@ -1,0 +1,54 @@
+@import "bootstrap/scss/bootstrap.scss";
+
+body{
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    height: 100vh;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+    #root{
+        width: 100%;
+    }
+}
+
+#main-container{
+    align-items: center;
+    height: 100vh;
+
+    #wrapper{
+        height: 600px;
+        width: 600px;
+        align-items: center;
+        border: 1px solid;
+        #btn-container{
+            align-items: center;
+            
+            button{
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+        }
+    }
+}
+
+.button-modal-a{
+    color: #46139f ;
+    border: 1px solid;
+}
+
+.button-modal-b{
+    color: #ff7f50 ;
+    border: 1px solid;
+}
+
+.main-div{
+    display: flex;
+    align-items: center;
+    width: 50%;
+    height: 50%;
+    margin: auto;
+    padding: auto;
+}
+
