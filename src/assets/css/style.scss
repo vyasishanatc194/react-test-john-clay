@@ -65,7 +65,10 @@ button{
     padding: 11px 31px;
 }
 
-.modal-cusotm {
+.modal-custom {
     max-width: 68%;
+    .modal-footer{
+        justify-content: flex-start;
+    }
 }
 

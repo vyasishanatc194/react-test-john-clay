@@ -26,6 +26,7 @@ class ModalPage extends React.Component {
           detailModel : false,
           detailId : 0,
           country : this.props.match.params.country,
+          loader : true
         }
     }
     
@@ -35,7 +36,7 @@ class ModalPage extends React.Component {
 
     componentDidUpdate(nextProps){
         if(nextProps.match.params.country !== this.props.match.params.country){
-            this.setState({country : nextProps.match.params.country})
+            this.setState({search : "",country : nextProps.match.params.country,loader : true})
             this.props.onlyEvenContact(false)
             this.handleGetContact('setContacts');
         }
@@ -44,6 +45,7 @@ class ModalPage extends React.Component {
     }
 
     handleGetContact = (dispatchOn) => {
+        this.setState({loader : true})
         let paramsForApi = {}
         paramsForApi.companyId = APP_CONFIG.COMPANY_ID
         paramsForApi.page = this.state.page;
@@ -68,6 +70,7 @@ class ModalPage extends React.Component {
                     this.props.paginationContact(result);
                     this.refs.scrollbars.scrollTop(topHeight);
                 }
+                this.setState({loader : false})
             }
         });
     }
@@ -119,7 +122,7 @@ class ModalPage extends React.Component {
         let contactDetails = contactsList[this.state.detailId]
         return (
             <div>
-                <Modal isOpen={this.state.basemodalOpen} className="modal-cusotm" toggle={this.handleClose}>
+                <Modal isOpen={this.state.basemodalOpen} className="modal-custom" toggle={this.handleClose}>
                     <ModalHeader >
                         <Link to={{pathname: "/modal/all",    state: { modal: true },  }} className="btn btn-md button-modal-a" onClick={this.handleCloseModal} >All Contacts</Link>
                         <Link to={{pathname: "/modal/us-country",    state: { modal: true },  }} color="normal" className="btn btn-md button-modal-b" onClick={this.handleCloseModal}>US Contacts</Link>
@@ -139,6 +142,7 @@ class ModalPage extends React.Component {
                                 </div>
                                 )
                             }
+                            {this.state.loader && <div className="justify-content-center"><div className="spinner-border"></div></div>}
                         </Scrollbars>
                     
                     </ModalBody>
@@ -151,9 +155,9 @@ class ModalPage extends React.Component {
                     </div>
                     </ModalFooter>
                 </Modal>
-                <Modal isOpen={this.state.detailModel} toggle={this.handleCloseDetailModel}>
+                <Modal className="modal-custom" isOpen={this.state.detailModel} toggle={this.handleCloseDetailModel}>
                     <ModalHeader >
-                        <Button color="normal" className="btn btn-md button-modal-close" onClick={this.handleCloseDetailModel}>Close</Button>
+                        
                     </ModalHeader>
                     <ModalBody>
                         {
@@ -347,7 +351,7 @@ class ModalPage extends React.Component {
                         
                     </ModalBody>
                     <ModalFooter>
-                    
+                        <Button color="normal" className="btn btn-md button-modal-close" onClick={this.handleCloseDetailModel}>Close</Button>
                     </ModalFooter>
                 </Modal>
             </div>
