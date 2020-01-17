@@ -11,3 +11,12 @@ export const setContact = (contact) => ({
   type: types.GET_CONTACT,
   payload : contact
 });
+
+export const paginationContact = (contact) => ({
+  type: types.PAGINATION_CONTACT,
+  payload : contact
+});
+export const onlyEvenContact = (checkboxvalue) => ({
+  type: types.ONLY_EVEN,
+  payload : checkboxvalue
+});

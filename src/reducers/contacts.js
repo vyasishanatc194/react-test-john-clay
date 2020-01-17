@@ -1,8 +1,10 @@
-import {   GET_CONTACT,SEARCH_CONTACT,COUNTRY_WISE} from "../actions/contactActions";
+import {   GET_CONTACT, PAGINATION_CONTACT, ONLY_EVEN} from "../actions/contactActions";
+import _ from "lodash";
 const initialState = {
     total : 0,
     contactIds : {},
     contacts : {},
+    onlyEven : false
   };
   const contacts = (state = {...initialState}, action) => {
     switch(action.type) {
@@ -13,10 +15,19 @@ const initialState = {
           contactIds : action.payload.contacts_ids,
           contacts : action.payload.contacts,
         };
-      case SEARCH_CONTACT:
-        return {...state};
-      case COUNTRY_WISE:
-        return {...state};
+      case PAGINATION_CONTACT:
+        return {
+          ...state,
+          total : action.payload.total,
+          contactIds : [...state.contactIds,action.payload.contactIds],
+          contacts : _.merge(_.cloneDeep(state.contacts),
+          action.payload.contacts)
+        };
+      case ONLY_EVEN:
+        return{
+          ...state,
+          onlyEven : action.payload
+        }
       default:
         return state;
     }
