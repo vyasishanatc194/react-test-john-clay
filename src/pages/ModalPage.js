@@ -25,7 +25,7 @@ class ModalPage extends React.Component {
           search : "",
           detailModel : false,
           detailId : 0,
-          country : this.props.match.params.country,
+          countryId  : this.props.match.params.countryId,
           loader : true
         }
     }
@@ -35,27 +35,27 @@ class ModalPage extends React.Component {
     }
 
     componentDidUpdate(nextProps){
-        if(nextProps.match.params.country !== this.props.match.params.country){
-            this.setState({search : "",country : nextProps.match.params.country,loader : true})
-            this.props.onlyEvenContact(false)
-            this.handleGetContact('setContacts');
+        if(nextProps.match.params.countryId !== this.props.match.params.countryId){
+            console.log("Inn");
+            this.setState({search : "",countryId  : nextProps.match.params.countryId, loader : true, page: 1}, () => {
+                this.props.onlyEvenContact(false)
+                this.handleGetContact('setContacts');
+            });
         }
-        
-        
     }
 
     handleGetContact = (dispatchOn) => {
         this.setState({loader : true})
         let paramsForApi = {}
-        paramsForApi.companyId = APP_CONFIG.COMPANY_ID
+        paramsForApi.companyId = APP_CONFIG.COMPANY_ID;
         paramsForApi.page = this.state.page;
         if(this.state.search !== ''){
             paramsForApi.query = this.state.search
         }
         if(dispatchOn !== "setContacts")
             this.setState({page: this.state.page + 1})
-        if(this.props.match.params.country !== "all"){
-            paramsForApi.country = APP_CONFIG.US_COUNTRY_ID;
+        if(this.props.match.params.countryId !== "all"){
+            paramsForApi.countryId = APP_CONFIG.US_COUNTRY_ID;
         }
         let topHeight = 0
         if(this.refs.scrollbars !== undefined){
@@ -86,9 +86,14 @@ class ModalPage extends React.Component {
     }
 
     handleOnchangeForSearch = (e) => {
-        this.setState({search : e.target.value},()=>{
-            setTimeout(this.handleGetContact('setContacts'),1000)
-        })
+        e.persist();
+        this.setState({search : e.target.value, page: 1},()=>{
+            if (e.key === 'Enter') {
+                this.handleGetContact('setContacts');
+            } else {
+                setTimeout(this.handleGetContact('setContacts'), 3000);
+            }
+        });
     }
 
     handleScrollFrame = () => {
@@ -116,8 +121,6 @@ class ModalPage extends React.Component {
     }
 
     render() {
-        console.log(this.props);
-        
         let contactsList = this.props.contacts;
         let contactDetails = contactsList[this.state.detailId]
         return (
@@ -131,16 +134,38 @@ class ModalPage extends React.Component {
                     <ModalBody>
                         <div className="form-group">
                             <label htmlFor="exampleInputSearch">Search</label>
-                            <input type="text" value={this.state.search} placeholder="Search" onChange={this.handleOnchangeForSearch} className="form-control" id="exampleInputSearch" />
+                            <input type="text" value={this.state.search} placeholder="Search" onKeyPress={this.handleOnchangeForSearch} onChange={this.handleOnchangeForSearch} className="form-control" id="exampleInputSearch" />
                         </div>
                         
                         <Scrollbars className="list-group" ref="scrollbars" universal onScrollFrame={this.handleScrollFrame}  style={{ height: 300 }}>
                             {
-                                Object.keys(contactsList).map((key,index) => <div className="list-group-item d-flex justify-content-between align-items-center" key={key}>
-                                    {contactsList[key].phone_number}({key}) 
-                                    <span className="badge badge-primary badge-pill view-detail" onClick={() => this.handleOpneDetailModel(key)}>View</span>
-                                </div>
-                                )
+                                <table className="table">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">PhoneNo.</th>
+                                        <th scope="col">Country</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            Object.keys(contactsList).map((key,index) => <tr key={key}>
+                                                <th scope="row">{key}</th>
+                                                <td>
+                                                    {contactsList[key].first_name}&nbsp;{contactsList[key].last_name}
+                                                </td>
+                                                <td>{contactsList[key].phone_number}</td>
+                                                <td>{contactsList[key].country.iso}</td>
+                                                <td>
+                                                    <span className="badge badge-primary badge-pill view-detail" onClick={() => this.handleOpneDetailModel(key)}>View</span>
+                                                </td>
+                                            </tr>)
+                                        }
+                                    
+                                    </tbody>
+                              </table>
                             }
                             {this.state.loader && <div className="justify-content-center"><div className="spinner-border"></div></div>}
                         </Scrollbars>
@@ -157,196 +182,152 @@ class ModalPage extends React.Component {
                 </Modal>
                 <Modal className="modal-custom" isOpen={this.state.detailModel} toggle={this.handleCloseDetailModel}>
                     <ModalHeader >
-                        
+                        Contact Detail
                     </ModalHeader>
                     <ModalBody>
                         {
-                            contactDetails !== undefined && <div className="container">
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Name:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.first_name} {contactDetails.last_name}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Email:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.email}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Contact No:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.phone_number}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Country Id:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.country_id}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Comment:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.comment}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Status:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.status}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Favorite:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.favorite}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Color:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.color}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        CCB:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_ccb}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        PCO:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_pco}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        MC:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_mc}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Elvanto:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_elvanto}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Breeze:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_breeze}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Is Duplicate:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_duplicate}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Has duplicate:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.has_duplicate}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        CCB Primary Contact:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_ccb_primary_contact}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        PCO Primary Contact:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_pco_primary_contact}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        MC Primary Contact:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_mc_primary_contact}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Is Elvanto Primary Contact:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_elvanto_primary_contact}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Is Breeze Primary Contact:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_breeze_primary_contact}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Unsub By User:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.unsub_by_user_id}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Is Contact Deleted:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_contact_deleted}
-                                    </div>
-                                </div>
-                                <div className="row justify-content-center">
-                                    <div className="col-4">
-                                        Is Contact Mark Deleted:
-                                    </div>
-                                    <div className="col-8">
-                                        {contactDetails.is_contact_mark_deleted}
-                                    </div>
-                                </div>
-                            </div>
+                            contactDetails !== undefined &&  <table className="table">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Name</th>
+                                        <td>
+                                            {contactDetails.first_name} {contactDetails.last_name}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Email</th>
+                                        <td>
+                                            {contactDetails.email}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Contact No</th>
+                                        <td>
+                                            {contactDetails.phone_number}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Country</th>
+                                        <td>
+                                            {contactDetails.country.iso}&nbsp;({contactDetails.country_id})
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Comment</th>
+                                        <td>
+                                            {contactDetails.comment}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Status</th>
+                                        <td>
+                                            {contactDetails.status}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Favorite</th>
+                                        <td>
+                                            {contactDetails.favorite}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Color</th>
+                                        <td>
+                                            {contactDetails.color}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">CCB</th>
+                                        <td>
+                                            {contactDetails.is_ccb}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">PCO</th>
+                                        <td>
+                                            {contactDetails.is_pco}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">MC</th>
+                                        <td>
+                                            {contactDetails.is_mc}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Elvanto</th>
+                                        <td>
+                                            {contactDetails.is_elvanto}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Breeze</th>
+                                        <td>
+                                            {contactDetails.is_breeze}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Is Duplicate</th>
+                                        <td>
+                                            {contactDetails.is_duplicate}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Has duplicate</th>
+                                        <td>
+                                            {contactDetails.has_duplicate}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">CCB Primary Contact:</th>
+                                        <td>
+                                            {contactDetails.is_ccb_primary_contact}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">PCO Primary Contact</th>
+                                        <td>
+                                            {contactDetails.is_pco_primary_contact}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">MC Primary Contact</th>
+                                        <td>
+                                            {contactDetails.is_mc_primary_contact}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Is Elvanto Primary Contact</th>
+                                        <td>
+                                            {contactDetails.is_elvanto_primary_contact}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Is Breeze Primary Contact</th>
+                                        <td>
+                                            {contactDetails.is_breeze_primary_contact}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Unsub By User</th>
+                                        <td>
+                                            {contactDetails.unsub_by_user_id}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Is Contact Deleted</th>
+                                        <td>
+                                            {contactDetails.is_contact_deleted}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Is Contact Mark Deleted</th>
+                                        <td>
+                                            {contactDetails.is_contact_mark_deleted}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         }
                         
                     </ModalBody>

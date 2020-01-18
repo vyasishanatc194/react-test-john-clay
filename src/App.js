@@ -13,7 +13,7 @@ class App extends React.Component {
           <Router history={history}>
             <Switch>
               <Route exact path="/" component={HomeContainer} />
-              <Route exact path="/modal/:country"  component={Modal} />
+              <Route exact path="/modal/:countryId"  component={Modal} />
               {/* <Route render={() => <Redirect to="/" />} /> */}
 
             </Switch>
