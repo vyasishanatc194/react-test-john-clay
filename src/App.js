@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React ,  { Fragment } from 'react';
+import { Router, Route,  Switch } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import history from './services/BrowserHistory';
+import { store } from './services/Redux';
+import HomeContainer from './containers/HomeContainer'
+import Modal from "./containers/ModalContainer";
+class App extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <Fragment>
+          <Router history={history}>
+            <Switch>
+              <Route exact path="/" component={HomeContainer} />
+              <Route exact path="/modal/:countryId"  component={Modal} />
+              {/* <Route render={() => <Redirect to="/" />} /> */}
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+            </Switch>
+          </Router>
+        </Fragment>
+      </Provider>
+    );
+  }
 }
 
 export default App;
